@@ -5,16 +5,15 @@ using Unity.Jobs;
 namespace Kurisu.NGram
 {
     /// <summary>
-    /// Multi-thread N-Gram implement using Job System
+    /// Multi-thread 4-Gram implement using Job System
     /// </summary>
     [BurstCompile]
-    public struct NGramJob : IJob
+    public struct NGram4Job : IJob
     {
         #region Job ReadOnly Property
         [ReadOnly]
         public NativeArray<byte> History;
-        [ReadOnly]
-        public int NGram;
+        public const int NGram = 4;
         [ReadOnly]
         public int Inference;
         #endregion

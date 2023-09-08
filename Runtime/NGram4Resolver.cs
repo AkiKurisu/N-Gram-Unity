@@ -9,7 +9,6 @@ namespace Kurisu.NGram
     public class NGram4Resolver : IDisposable
     {
         private NativeArray<byte>? history;
-        private const int NGram = 4;
         public byte Result { get; private set; }
         private JobHandle jobHandle;
         private NativeArray<int>? result;
@@ -28,12 +27,11 @@ namespace Kurisu.NGram
             byte word3 = inference[^1];
             //Zip in a simple int value
             int inferenceKey = BitConverter.ToInt32(new byte[] { word1, word2, word3, 0 });
-            jobHandle = new NGramJob()
+            jobHandle = new NGram4Job()
             {
                 History = this.history.Value,
                 Inference = inferenceKey,
                 Result = result.Value,
-                NGram = NGram
             }.Schedule();
         }
         public void Complete()
