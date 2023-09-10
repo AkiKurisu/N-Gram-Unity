@@ -5,7 +5,7 @@ namespace Kurisu.NGram
     //Example for predict byte using N-Gram
     public class ByteNGramRunner : MonoBehaviour
     {
-        private NGram4Resolver resolver;
+        private INGramResolver resolver;
         private IEnumerator Start()
         {
             byte[] history = { 0, 1, 2, 3, 1, 5, 6, 2, 3, 4, 3, 2, 3, 4, 9, 10 };

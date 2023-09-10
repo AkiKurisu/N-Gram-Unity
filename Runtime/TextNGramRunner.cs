@@ -14,7 +14,7 @@ namespace Kurisu.NGram
         private byte[] inferenceIndex;
         private readonly Dictionary<char, byte> char2Byte = new();
         private readonly Dictionary<byte, char> byte2Char = new();
-        private NGram4Resolver resolver;
+        private INGramResolver resolver;
         private byte index = 0;
         private IEnumerator Start()
         {

@@ -5,10 +5,10 @@ using Unity.Jobs;
 namespace Kurisu.NGram
 {
     /// <summary>
-    /// Multi-thread 2~4 Gram implement using Job System
+    /// Multi-thread 2~8 Gram implement using Job System
     /// </summary>
     [BurstCompile]
-    public struct NGram4Job : IJob
+    public struct NGram8Job : IJob
     {
         #region Job ReadOnly Properties
         [ReadOnly]
@@ -18,16 +18,16 @@ namespace Kurisu.NGram
         [ReadOnly]
         public NativeArray<byte> Inference;
         #endregion
-        public NativeArray<int> Result;
+        public NativeArray<double> Result;
         [BurstCompile]
         public void Execute()
         {
             int count = History.Length - NGram + 1;
-            var predictions = new NativeHashMap<int, int>(count, Allocator.Temp);
+            var predictions = new NativeHashMap<double, double>(count, Allocator.Temp);
             //Dictionary<Pattern,OccurenceKey>
-            var worldOccurence = new NativeMultiHashMap<int, int>(count, Allocator.Temp);
+            var worldOccurence = new NativeMultiHashMap<double, double>(count, Allocator.Temp);
             //Dictionary<OccurenceKey,OccurenceCount>
-            var occurenceMap = new NativeHashMap<int, int>(count, Allocator.Temp);
+            var occurenceMap = new NativeHashMap<double, int>(count, Allocator.Temp);
             Compression(worldOccurence, occurenceMap);
             BuildPrediction(worldOccurence, occurenceMap, predictions);
             TryInference(predictions);
@@ -35,23 +35,23 @@ namespace Kurisu.NGram
             worldOccurence.Dispose();
             occurenceMap.Dispose();
         }
-        //Compress byte[] to int32 (4 bytes)
+        //Compress byte[] to double (8 bytes)
         [BurstCompile]
         private void Compression(
-            NativeMultiHashMap<int, int> worldOccurence,
-            NativeHashMap<int, int> occurenceMap
+            NativeMultiHashMap<double, double> worldOccurence,
+            NativeHashMap<double, int> occurenceMap
          )
         {
-            var buffer = new NativeArray<byte>(4, Allocator.Temp);
+            var buffer = new NativeArray<byte>(8, Allocator.Temp);
             int count = History.Length - NGram + 1;
             for (int i = 0; i < count; i++)
             {
-                for (int j = 0; j < 4; j++)
+                for (int j = 0; j < 8; j++)
                 {
                     buffer[j] = (j < NGram - 1) ? History[i + j] : (byte)0;
                 }
-                int key = buffer.Reinterpret<int>(UnsafeUtility.SizeOf<byte>())[0];
-                buffer[3] = History[i + 3];
+                double key = buffer.Reinterpret<double>(UnsafeUtility.SizeOf<byte>())[0];
+                buffer[7] = History[i + 7];
                 int occurenceKey = buffer.Reinterpret<int>(UnsafeUtility.SizeOf<byte>())[0];
                 if (occurenceMap.TryGetValue(occurenceKey, out int occurences))
                 {
@@ -66,16 +66,16 @@ namespace Kurisu.NGram
             buffer.Dispose();
         }
         [BurstCompile]
-        private void TryInference(NativeHashMap<int, int> predictions)
+        private void TryInference(NativeHashMap<double, double> predictions)
         {
-            var buffer = new NativeArray<byte>(4, Allocator.Temp);
-            for (int i = 0; i < 4; i++)
+            var buffer = new NativeArray<byte>(8, Allocator.Temp);
+            for (int i = 0; i < 8; i++)
             {
                 buffer[i] = (i < NGram - 1) ? Inference[^(NGram - 1 - i)] : (byte)0;
             }
-            int key = buffer.Reinterpret<int>(UnsafeUtility.SizeOf<byte>())[0];
+            double key = buffer.Reinterpret<double>(UnsafeUtility.SizeOf<byte>())[0];
             buffer.Dispose();
-            if (predictions.TryGetValue(key, out int result))
+            if (predictions.TryGetValue(key, out double result))
             {
                 Result[0] = result;
             }
@@ -86,16 +86,16 @@ namespace Kurisu.NGram
         }
         [BurstCompile]
         private readonly void BuildPrediction(
-             NativeMultiHashMap<int, int> worldOccurence,
-            NativeHashMap<int, int> occurenceMap,
-            NativeHashMap<int, int> predictions
+             NativeMultiHashMap<double, double> worldOccurence,
+            NativeHashMap<double, int> occurenceMap,
+            NativeHashMap<double, double> predictions
         )
         {
             var keys = worldOccurence.GetKeyArray(Allocator.Temp);
             foreach (var start in keys)
             {
-                int prediction = -1;
-                int maximum = 0;
+                double prediction = -1;
+                double maximum = double.MinValue;
                 foreach (var end in worldOccurence.GetValuesForKey(start))
                 {
                     if (occurenceMap[end] > maximum)

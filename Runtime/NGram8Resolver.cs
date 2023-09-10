@@ -4,9 +4,9 @@ using Unity.Jobs;
 namespace Kurisu.NGram
 {
     /// <summary>
-    /// An example N-Gram resolver for 4-Gram
+    /// An example N-Gram resolver for 8-Gram
     /// </summary>
-    public class NGram4Resolver : INGramResolver, IDisposable
+    public class NGram8Resolver : INGramResolver, IDisposable
     {
         private NativeArray<byte>? history;
         private NativeArray<byte>? inference;
@@ -41,21 +41,20 @@ namespace Kurisu.NGram
                 History = this.history.Value,
                 Inference = this.inference.Value,
                 Result = result.Value,
-                NGram = 4
+                NGram = 8
             }.Schedule();
         }
         public void Complete()
         {
             jobHandle.Complete();
-            //[first][second][third][predict]
             Success = result.Value[0] >= 0;
             if (Success)
-                Result = BitConverter.GetBytes(result.Value[0])[3];
+                Result = BitConverter.GetBytes(result.Value[0])[7];
             result.Value.Dispose();
             history.Value.Dispose();
             inference.Value.Dispose();
-            history = null;
             inference = null;
+            history = null;
             result = null;
         }
     }
