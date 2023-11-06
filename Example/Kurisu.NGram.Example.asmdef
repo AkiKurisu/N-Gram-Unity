@@ -1,0 +1,16 @@
+{
+    "name": "Kurisu.NGram.Example",
+    "rootNamespace": "Kurisu.NGram.Example",
+    "references": [
+        "GUID:ef5fffd072197354589acb1a57cb0d5b"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -10,16 +10,16 @@ namespace Kurisu.NGram
         private string history;
         [SerializeField, Multiline]
         private string inference;
-        private byte[] historyIndex;
-        private byte[] inferenceIndex;
-        private readonly Dictionary<char, byte> char2Byte = new();
-        private readonly Dictionary<byte, char> byte2Char = new();
+        private int[] historyIndex;
+        private int[] inferenceIndex;
+        private readonly Dictionary<char, int> char2Byte = new();
+        private readonly Dictionary<int, char> byte2Char = new();
         private INGramResolver resolver;
         private byte index = 0;
         private IEnumerator Start()
         {
             Tokenization();
-            resolver = new NGram4Resolver();
+            resolver = new NGram8Resolver() { NGram = 4 };
             resolver.Resolve(historyIndex, inferenceIndex);
             yield return new WaitForEndOfFrame();
             resolver.Complete();
@@ -27,8 +27,8 @@ namespace Kurisu.NGram
         }
         private void Tokenization()
         {
-            historyIndex = new byte[history.Length];
-            inferenceIndex = new byte[inference.Length];
+            historyIndex = new int[history.Length];
+            inferenceIndex = new int[inference.Length];
             for (int i = 0; i < history.Length; i++)
             {
                 if (!char2Byte.ContainsKey(history[i]))

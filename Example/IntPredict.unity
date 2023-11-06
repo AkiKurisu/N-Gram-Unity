@@ -164,26 +164,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 834653238}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 52f48167ad1b4734ebeba000a963babe, type: 3}
+  m_Script: {fileID: 11500000, guid: 34e5af15c0142f649bdf70c19f1199fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  historySkills:
-  - "\u89C9\u9192"
-  - "\u5F3A\u88AD"
-  - "\u4F11\u606F"
-  - "\u62A4\u4F51"
-  - "\u6495\u54AC"
-  - "\u5F3A\u88AD"
-  - "\u89C9\u9192"
-  - "\u4F11\u606F"
-  - "\u706B\u7403"
-  - "\u5237\u65B0"
-  - "\u66B4\u6012"
-  - "\u683C\u6321"
-  - "\u5F3A\u88AD"
-  - "\u6495\u54AC"
-  - "\u706B\u7403"
-  - "\u4F11\u606F"
-  - "\u62A4\u4F51"
-  - "\u6495\u54AC"
-  tokenizer: {fileID: 4900000, guid: 3154fb38c91a05b45b9420aeac9cec06, type: 3}
+  nGram: 12
+  idRange: 10

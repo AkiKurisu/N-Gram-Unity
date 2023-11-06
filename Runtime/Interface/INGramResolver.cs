@@ -3,10 +3,11 @@ namespace Kurisu.NGram
     public interface INGramResolver
     {
         bool Success { get; }
-        byte Result { get; }
+        int Result { get; }
+        int NGram { get; set; }
         void Dispose();
-        void Resolve(byte[] history, byte[] inference);
-        void Resolve(byte[] history, byte[] inference, int historyStartIndex, int historyLength);
+        void Resolve(int[] history, int[] inference);
+        void Resolve(int[] history, int[] inference, int historyStartIndex, int historyLength);
         void Complete();
     }
 }
