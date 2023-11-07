@@ -6,8 +6,8 @@ namespace Kurisu.NGram
 {
 
     /// <summary>
-    /// Multi-thread N Gram almost without limited
-    /// Use XXHash to index, may exist hash collision when input id range or n gram become larger
+    /// Multi-thread N Gram almost without limit
+    /// Use XXHash to index, may meet hash collision when inputting id range or n gram become larger
     /// </summary>
     [BurstCompile]
     public struct NGramParallelJob : IJobParallelFor
@@ -33,7 +33,6 @@ namespace Kurisu.NGram
             var worldOccurrence = new NativeParallelMultiHashMap<uint, uint>(count, Allocator.Temp);
             //Dictionary<OccurrenceKey,OccurrenceCount>
             var occurrenceMap = new NativeParallelHashMap<uint, int>(count, Allocator.Temp);
-            //Dictionary<OccurrenceKey,OccurrenceCount>
             var pointerMap = new NativeParallelHashMap<uint, int>(count, Allocator.Temp);
 #else
             var predictions = new NativeHashMap<uint, uint>(count, Allocator.Temp);

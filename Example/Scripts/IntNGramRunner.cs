@@ -14,9 +14,9 @@ namespace Kurisu.NGram
         private IEnumerator Start()
         {
             Debug.Log("History:");
-            int[] history = RandomID(2000);
+            int[] history = RandomID(2000, idRange);
             Debug.Log("Inference:");
-            int[] inference = RandomID(nGram - 1);
+            int[] inference = RandomID(nGram - 1, idRange);
             resolver = new NGramParallelResolver() { NGram = nGram };
             //Use last as inference
             resolver.Resolve(history, inference);
@@ -24,7 +24,7 @@ namespace Kurisu.NGram
             resolver.Complete();
             Debug.Log("Predict:" + resolver.Result);
         }
-        private int[] RandomID(int length)
+        private static int[] RandomID(int length, int idRange)
         {
             int[] id = new int[length];
             StringBuilder stringBuilder = new(length * 2);

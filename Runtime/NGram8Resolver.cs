@@ -24,26 +24,31 @@ namespace Kurisu.NGram
         }
         public void Resolve(int[] history, int[] inference)
         {
+            Resolve(history, inference, 0, history.Length);
+        }
+        public void Resolve(int[] history, int[] inference, int historyStartIndex, int historyLength)
+        {
             if (NGram < 2 || NGram > 8)
             {
                 Debug.LogError($"{NGram}-Gram is not valid for {nameof(NGram8Resolver)}");
                 return;
             }
-            Resolve(history, inference, 0, history.Length);
-        }
-        public void Resolve(int[] history, int[] inference, int historyStartIndex, int historyLength)
-        {
+            if (inference.Length < NGram - 1)
+            {
+                Debug.LogError($"Inference's length is less than {NGram - 1}");
+                return;
+            }
             result = new NativeArray<double>(1, Allocator.TempJob);
             var historyArray = new NativeArray<byte>(historyLength, Allocator.TempJob);
-            for (int i = 0; i < historyLength; i++)
+            for (int i = 0; i < historyLength; ++i)
             {
                 historyArray[i] = (byte)history[i + historyStartIndex];
             }
             this.history = historyArray;
-            var inferenceArray = new NativeArray<byte>(inference.Length, Allocator.TempJob);
-            for (int i = 0; i < inference.Length; i++)
+            var inferenceArray = new NativeArray<byte>(NGram - 1, Allocator.TempJob);
+            for (int i = 0; i < NGram - 1; ++i)
             {
-                inferenceArray[i] = (byte)inference[i];
+                inferenceArray[i] = (byte)inference[inference.Length - NGram + i + 1];
             }
             this.inference = inferenceArray;
             jobHandle = new NGram8Job()

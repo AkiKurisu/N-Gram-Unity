@@ -32,6 +32,16 @@ namespace Kurisu.NGram
         }
         public void Resolve(int[] history, int[] inference, int historyStartIndex, int historyLength)
         {
+            if (NGram < 2)
+            {
+                Debug.LogError($"{NGram}-Gram is not valid for {nameof(NGramParallelResolver)}");
+                return;
+            }
+            if (inference.Length < NGram - 1)
+            {
+                Debug.LogError($"Inference's length is less than {NGram - 1}");
+                return;
+            }
             result = new NativeArray<int>(Length, Allocator.TempJob);
             var historyArray = new NativeArray<int>(historyLength, Allocator.TempJob);
             for (int i = 0; i < historyLength; i++)
@@ -39,7 +49,12 @@ namespace Kurisu.NGram
                 historyArray[i] = history[i + historyStartIndex];
             }
             this.history = historyArray;
-            this.inference = new NativeArray<int>(inference, Allocator.TempJob);
+            var inferenceArray = new NativeArray<int>(NGram - 1, Allocator.TempJob);
+            for (int i = 0; i < NGram - 1; ++i)
+            {
+                inferenceArray[i] = inference[inference.Length - NGram + i + 1];
+            }
+            this.inference = inferenceArray;
             jobHandle = new NGramParallelJob()
             {
                 History = this.history.Value,
@@ -51,7 +66,8 @@ namespace Kurisu.NGram
         public void Complete()
         {
             jobHandle.Complete();
-            Result = GetMax();
+            resultsMap.Clear();
+            Result = GetMax(result.Value, resultsMap);
             Success = Result >= 0;
             result.Value.Dispose();
             history.Value.Dispose();
@@ -60,18 +76,18 @@ namespace Kurisu.NGram
             history = null;
             result = null;
         }
-        public int GetMax()
+        private static int GetMax(NativeArray<int> array, Dictionary<int, int> resultsMap)
         {
-            for (int i = 0; i < result.Value.Length; ++i)
+            for (int i = 0; i < array.Length; ++i)
             {
-                if (result.Value[i] == -1) continue;
-                if (resultsMap.ContainsKey(result.Value[i]))
+                if (array[i] == -1) continue;
+                if (resultsMap.ContainsKey(array[i]))
                 {
-                    resultsMap[result.Value[i]] += 1;
+                    resultsMap[array[i]] += 1;
                 }
                 else
                 {
-                    resultsMap[result.Value[i]] = 1;
+                    resultsMap[array[i]] = 1;
                 }
             }
             int maxCount = 0;
